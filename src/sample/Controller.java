@@ -3,6 +3,7 @@ package sample;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
@@ -16,23 +17,27 @@ public class Controller {
     Socket socket;
     DataOutputStream out;
     Thread thread;
+    DataInputStream in;
     @FXML
     TextArea textArea;
     @FXML
     TextField textField;
+    @FXML
+    Button buttonConnect;
 
     @FXML
     private void onSubmit(){
-        if (socket == null) {
-            textArea.appendText("Необходимо подключится! \n");
+        if (socket == null || socket.isClosed()) {
+            Platform.runLater(() -> textArea.appendText("Необходимо подключится! \n"));
             return;}
         String text = textField.getText();
-        textArea.appendText(text+"\n");
+        Platform.runLater(() -> textArea.appendText(text+"\n")); //Почему то просто appendText после отключения -
+                                                                    // подключения падал с ошибкой NullPoinEx...
         textField.clear();
         try {
             out.writeUTF(text);
         } catch (IOException e) {
-            textArea.appendText("Ошибка");
+            Platform.runLater(() -> textArea.appendText("Ошибка"));
             e.printStackTrace();
         }
 
@@ -46,31 +51,51 @@ public class Controller {
     @FXML
     private void connect(){
         try {
-            socket = new Socket("localhost",8188);
-            out=new DataOutputStream(socket.getOutputStream());
-            System.out.println("Подключился");
-            DataInputStream in =new DataInputStream(socket.getInputStream());
+            if(socket!=null && !socket.isClosed()){
+                thread.interrupt();
 
-            String response = in.readUTF(); // Ждём сообщение от сервера
-            textArea.appendText("Ответ от сервера: "+response+"\n");
+                if(thread.isInterrupted())
+                    throw new InterruptedException();
 
-            thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while(true){
-                        try {
-                            String response = in.readUTF();
-                            textArea.appendText(response+"\n");
-                        } catch (IOException exception) {
-                            exception.printStackTrace();
+            } else {
+                socket = new Socket("localhost", 8188);
+                out = new DataOutputStream(socket.getOutputStream());
+                //System.out.println("Подключился");
+                in = new DataInputStream(socket.getInputStream());
+                buttonConnect.setText("Отключиться");
+                String response = in.readUTF(); // Ждём сообщение от сервера
+                Platform.runLater(() -> textArea.appendText("Ответ от сервера: " + response + "\n"));
+
+                thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (!Thread.currentThread().isInterrupted()) {
+                            try {
+                                String response = in.readUTF();
+                                Platform.runLater(() -> textArea.appendText(response + "\n"));
+                            } catch (IOException exception) {
+                                Platform.runLater(() -> textArea.appendText("Нет связи с сервером!\n"));
+                                //exception.printStackTrace();
+                            }
                         }
                     }
+                });
+                thread.start();
+            }
+
+
+            } catch (InterruptedException ex){
+                try {
+                    socket.close();
+                    in.close();
+                    out.close();
+
+                    thread.interrupt();
+                    textArea.appendText("Отключились \n");
+                    buttonConnect.setText("Подключиться");
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            });
-            thread.start();
-
-
-
         } catch (IOException exception) {
             exception.printStackTrace();
         }
