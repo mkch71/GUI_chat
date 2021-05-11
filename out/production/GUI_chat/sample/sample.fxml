@@ -3,15 +3,23 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="275.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
-   <children>
-      <Button fx:id="buttonConnect" onAction="#connect" prefHeight="30" prefWidth="Infinity" text="Подключиться" />
-      <TextArea maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" fx:id="textArea" editable="false" prefHeight="240.0" prefWidth="275.0" wrapText="true" />
-      <HBox alignment="BOTTOM_LEFT" prefHeight="30.0" prefWidth="275.0">
-         <children>
-            <TextField fx:id="textField" onAction="#onSubmit" prefHeight="30.0" prefWidth="200" />
-            <Button mnemonicParsing="false" onAction="#onSubmit" prefHeight="30.0" prefWidth="75" text="Отправить" />
-         </children>
-      </HBox>
-   </children>
-</VBox>
+<HBox maxHeight="Infinity" maxWidth="Infinity" minHeight="Infinity" minWidth="Infinity" prefHeight="300.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <VBox prefHeight="300" prefWidth="125.0">
+      <Label fx:id="label" prefHeight="30" text="NoConnection.." />
+      <TextArea fx:id="textAreaUserList" editable="false" prefHeight="270" prefWidth="125.0" style="-fx-background-color: red;" />
+
+   </VBox>
+   <VBox prefHeight="300.0" prefWidth="275.0">
+      <children>
+         <Button fx:id="buttonConnect" maxWidth="Infinity" onAction="#connect" prefHeight="30" text="Подключиться" />
+         <TextArea fx:id="textArea" editable="false" maxWidth="Infinity" prefHeight="240.0" prefWidth="275.0" wrapText="true" />
+         <HBox alignment="BOTTOM_LEFT" prefHeight="30.0" prefWidth="275.0">
+            <children>
+               <TextField fx:id="textField" onAction="#onSubmit" prefHeight="30.0" prefWidth="200" />
+               <Button mnemonicParsing="false" onAction="#onSubmit" prefHeight="30.0" prefWidth="75" text="Отправить" />
+            </children>
+         </HBox>
+
+      </children>
+   </VBox>
+</HBox>
