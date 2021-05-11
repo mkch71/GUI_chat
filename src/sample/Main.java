@@ -14,9 +14,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
+       // Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Parent root = loader.load();
+        Controller controller = loader.getController();
+        // передать stage в контроллер
+        controller.setStage(primaryStage);
         primaryStage.setTitle("Клиент сетевого чата");
-        primaryStage.setScene(new Scene(root, 275, 300));
+        primaryStage.setScene(new Scene(root, 400, 300));
         primaryStage.show();
         primaryStage.setOnCloseRequest(e -> {
             Platform.exit();
